@@ -1,0 +1,34 @@
+<% layout("/layouts/boilerplate") %>
+<div class="form-card mx-auto">
+  <h1 class="h2 mb-4">Edit your listing</h1>
+  <form action="/listings/<%= listing._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label class="form-label" for="title">Listing name</label>
+      <input class="form-control" id="title" name="listing[title]" value="<%= listing.title %>" required minlength="3" maxlength="100">
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="description">Description</label>
+      <textarea class="form-control" id="description" name="listing[description]" rows="4" required minlength="10" maxlength="3000"><%= listing.description %></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="image">Replace photo (optional)</label>
+      <input class="form-control" id="image" name="image" type="file" accept="image/png,image/jpeg,image/webp">
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label" for="price">Price per night (USD)</label>
+        <input class="form-control" id="price" name="listing[price]" type="number" min="1" max="1000000" value="<%= listing.price %>" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label" for="location">City or area</label>
+        <input class="form-control" id="location" name="listing[location]" value="<%= listing.location %>" required maxlength="100">
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="form-label" for="country">Country</label>
+      <input class="form-control" id="country" name="listing[country]" value="<%= listing.country %>" required maxlength="100">
+    </div>
+    <button class="btn btn-danger" type="submit">Save changes</button>
+    <a class="btn btn-link text-secondary" href="/listings/<%= listing._id %>">Cancel</a>
+  </form>
+</div>

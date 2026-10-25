@@ -1,0 +1,36 @@
+<% layout("/layouts/boilerplate") %>
+<h1 class="h2 mb-4">Reservation requests for my listings</h1>
+<% if (reservations.length === 0) { %>
+  <p class="text-secondary">There are no reservation requests yet.</p>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Listing</th><th>Guest</th><th>Dates</th><th>Guests</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        <% reservations.forEach((reservation) => { %>
+          <tr>
+            <td><%= reservation.listing ? reservation.listing.title : "Deleted listing" %></td>
+            <td><%= reservation.guest ? reservation.guest.username : "Deleted account" %></td>
+            <td><%= reservation.checkIn.toLocaleDateString() %> – <%= reservation.checkOut.toLocaleDateString() %></td>
+            <td><%= reservation.guests %></td>
+            <td><%= reservation.status %></td>
+            <td>
+              <% if (reservation.status === "pending") { %>
+                <div class="d-flex gap-2">
+                  <form action="/reservations/<%= reservation._id %>/status?_method=PUT" method="POST">
+                    <input type="hidden" name="status" value="approved">
+                    <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                  </form>
+                  <form action="/reservations/<%= reservation._id %>/status?_method=PUT" method="POST">
+                    <input type="hidden" name="status" value="cancelled">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Cancel</button>
+                  </form>
+                </div>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

@@ -1,0 +1,26 @@
+<% layout("/layouts/boilerplate") %>
+<h1 class="h2 mb-4">My trips</h1>
+<% if (reservations.length === 0) { %>
+  <p class="text-secondary">You haven't requested a stay yet.</p>
+  <a class="btn btn-danger" href="/listings">Explore listings</a>
+<% } else { %>
+  <div class="row g-3">
+    <% reservations.forEach((reservation) => { %>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <% if (reservation.listing) { %>
+            <img class="reservation-image" src="<%= reservation.listing.image.url %>" alt="<%= reservation.listing.title %>">
+            <div class="card-body">
+              <h2 class="h5"><a class="text-dark" href="/listings/<%= reservation.listing._id %>"><%= reservation.listing.title %></a></h2>
+              <p class="text-secondary"><%= reservation.listing.location %>, <%= reservation.listing.country %></p>
+          <% } else { %>
+            <div class="card-body"><h2 class="h5">Listing no longer available</h2>
+          <% } %>
+              <p><%= reservation.checkIn.toLocaleDateString() %> – <%= reservation.checkOut.toLocaleDateString() %></p>
+              <p class="mb-0">Guests: <%= reservation.guests %> · Status: <strong><%= reservation.status %></strong></p>
+            </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

@@ -1,0 +1,90 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <img class="detail-image" src="<%= listing.image.url %>" alt="<%= listing.title %>">
+  </div>
+  <div class="col-lg-5">
+    <p class="text-secondary mb-1"><%= listing.location %>, <%= listing.country %></p>
+    <h1 class="h2"><%= listing.title %></h1>
+    <p class="text-secondary">Hosted by <strong><%= listing.owner.username %></strong></p>
+    <p class="listing-description"><%= listing.description %></p>
+    <p class="h4 mb-4">$<%= listing.price.toLocaleString() %> <span class="fs-6 fw-normal text-secondary">per night</span></p>
+
+    <% if (currentUser && !listing.owner._id.equals(currentUser._id)) { %>
+      <div class="border rounded-3 p-3 mb-3">
+        <h2 class="h5">Request a stay</h2>
+        <form action="/listings/<%= listing._id %>/reservations" method="POST">
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label" for="checkIn">Check in</label>
+              <input class="form-control" type="date" id="checkIn" name="reservation[checkIn]" required>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label" for="checkOut">Check out</label>
+              <input class="form-control" type="date" id="checkOut" name="reservation[checkOut]" required>
+            </div>
+          </div>
+          <label class="form-label" for="guests">Guests</label>
+          <input class="form-control mb-3" type="number" id="guests" name="reservation[guests]" min="1" max="20" value="1" required>
+          <button class="btn btn-danger w-100" type="submit">Send booking request</button>
+        </form>
+      </div>
+    <% } else if (!currentUser) { %>
+      <a href="/login" class="btn btn-danger mb-3">Log in to request a stay</a>
+    <% } %>
+
+    <% if (currentUser && listing.owner._id.equals(currentUser._id)) { %>
+      <div class="d-flex gap-2 mb-4">
+        <a class="btn btn-outline-dark" href="/listings/<%= listing._id %>/edit">Edit listing</a>
+        <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this listing and its reviews?')">
+          <button class="btn btn-outline-danger" type="submit">Delete</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<hr class="my-5">
+<section class="row">
+  <div class="col-lg-7">
+    <h2 class="h4 mb-3">Reviews</h2>
+    <% if (currentUser) { %>
+      <form class="border rounded-3 p-3 mb-4" action="/listings/<%= listing._id %>/reviews" method="POST">
+        <label class="form-label" for="rating">Your rating</label>
+        <select class="form-select mb-3" id="rating" name="review[rating]" required>
+          <option value="">Choose a rating</option>
+          <option value="5">5 - Excellent</option>
+          <option value="4">4 - Very good</option>
+          <option value="3">3 - Good</option>
+          <option value="2">2 - Fair</option>
+          <option value="1">1 - Poor</option>
+        </select>
+        <label class="form-label" for="body">Your review</label>
+        <textarea class="form-control mb-3" id="body" name="review[body]" rows="3" required minlength="3" maxlength="1000"></textarea>
+        <button class="btn btn-danger" type="submit">Post review</button>
+      </form>
+    <% } else { %>
+      <p><a href="/login">Log in</a> to leave a review.</p>
+    <% } %>
+
+    <% if (listing.reviews.length === 0) { %>
+      <p class="text-secondary">No reviews yet.</p>
+    <% } %>
+    <% listing.reviews.forEach((review) => { %>
+      <article class="border-bottom py-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <strong><%= review.author.username %></strong>
+            <div class="text-warning" aria-label="<%= review.rating %> out of 5 stars"><%= "★".repeat(review.rating) %><span class="text-secondary"><%= "★".repeat(5 - review.rating) %></span></div>
+          </div>
+          <% if (currentUser && review.author._id.equals(currentUser._id)) { %>
+            <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          <% } %>
+        </div>
+        <p class="mb-0 mt-2"><%= review.body %></p>
+      </article>
+    <% }) %>
+  </div>
+</section>
