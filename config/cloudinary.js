@@ -1,4 +1,5 @@
 const cloudinary = require("cloudinary").v2;
+const { randomUUID } = require("crypto");
 
 // Read credentials from .env instead of putting private keys in source code.
 cloudinary.config({
@@ -9,6 +10,13 @@ cloudinary.config({
 
 // Multer keeps the selected image in memory, then this helper sends it to Cloudinary.
 function uploadImage(file) {
+  if (process.env.DEMO_MODE === "true") {
+    return Promise.resolve({
+      url: `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
+      filename: `demo-${randomUUID()}`
+    });
+  }
+
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream({
       folder: "wanderlust",
@@ -26,4 +34,11 @@ function uploadImage(file) {
   });
 }
 
-module.exports = { cloudinary, uploadImage };
+function deleteImage(filename) {
+  if (process.env.DEMO_MODE === "true") {
+    return Promise.resolve();
+  }
+  return cloudinary.uploader.destroy(filename);
+}
+
+module.exports = { cloudinary, uploadImage, deleteImage };

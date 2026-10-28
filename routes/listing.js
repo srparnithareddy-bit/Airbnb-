@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const Listing = require("../models/listing");
 const Reservation = require("../models/reservation");
-const { cloudinary, uploadImage } = require("../config/cloudinary");
+const { uploadImage, deleteImage } = require("../config/cloudinary");
 const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/ExpressError");
 const {
@@ -45,7 +45,7 @@ router.post("/", isLoggedIn, upload.single("image"), validateListing, catchAsync
   try {
     await listing.save();
   } catch (error) {
-    await cloudinary.uploader.destroy(image.filename);
+    await deleteImage(image.filename);
     throw error;
   }
   req.flash("success", "Your listing has been created.");
@@ -66,10 +66,10 @@ router.put("/:id", isLoggedIn, isListingOwner, upload.single("image"), validateL
     try {
       await listing.save();
     } catch (error) {
-      await cloudinary.uploader.destroy(newImage.filename);
+      await deleteImage(newImage.filename);
       throw error;
     }
-    await cloudinary.uploader.destroy(oldImageFilename);
+    await deleteImage(oldImageFilename);
   } else {
     await listing.save();
   }
@@ -80,7 +80,7 @@ router.put("/:id", isLoggedIn, isListingOwner, upload.single("image"), validateL
 router.delete("/:id", isLoggedIn, isListingOwner, catchAsync(async function (req, res) {
   const listing = res.locals.listing;
   await Reservation.deleteMany({ listing: listing._id });
-  await cloudinary.uploader.destroy(listing.image.filename);
+  await deleteImage(listing.image.filename);
   await Listing.findOneAndDelete({ _id: listing._id });
   req.flash("success", "Your listing has been deleted.");
   res.redirect("/listings");

@@ -38,6 +38,23 @@ Node.js, Express, MongoDB, Mongoose, EJS, Passport, and Cloudinary.
 The app creates its collections when data is first saved. Session data is also
 stored in MongoDB, so use the same database connection for the app and sessions.
 
+## Preview locally without an external database
+
+To explore the app without configuring MongoDB Atlas or Cloudinary, set
+`DEMO_MODE=true` in `.env` and run `npm run dev`. The first start may download
+the MongoDB binary used by the local in-memory database. The app seeds example
+listings, a review, and a reservation; changes are discarded when the server
+stops. Listing photo uploads are held in the in-memory database for the demo.
+
+Use either login on the login page:
+
+- Guest: `demo` / `wanderlust123`
+- Host: `demo-host` / `wanderlust123`
+
+The guest account can request stays and post reviews. Sign in as the host to
+manage listings and approve or cancel reservation requests. Set `DEMO_MODE=false`
+to return to the normal MongoDB and Cloudinary setup.
+
 ## Main features
 
 - Register, log in, and log out with Passport local authentication.
